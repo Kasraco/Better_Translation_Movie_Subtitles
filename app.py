@@ -1,6 +1,6 @@
 import re
 import os
-from translate import Translator
+from googletrans import Translator
 from itertools import groupby
 from flask import Flask
 app = Flask(__name__)
@@ -12,10 +12,13 @@ def main_page():
 
    convertedText=readfile()
    translatefile(convertedText)
-   return 'Hello World mostafa'
+   return convertedText
 
 def readfile():
-   #translator= Translator(to_lang="Persian")    
+    translator= Translator() 
+    result=translator.translate('hello',dest='fa',src='en')
+    #print(result.text)
+    #return(result.text)
     texts=""
     # read file line by line
     filepath=os.path.join(os.path.dirname(__file__), "subfile.srt")
@@ -36,14 +39,14 @@ def readfile():
          datetime1=''
          datetime2=''
          grouptext=''
-         number1=matches[0][0]
+         number1=lineNum+1
          datetime1=matches[0][1] 
          for matchNum in enumerate(matches, start=1):
                datetime2=matchNum[1][2]
                grouptext+=matchNum[1][3]
 
-        # grouptxtTranslate = translator.translate(grouptext)
-         alltext+=("{num1}\n{d1} --> {d2}\n{txt}.\n\n".format(num1=number1,d1=datetime1,d2=datetime2,txt=grouptext))
+         grouptxtTranslate = translator.translate(grouptext,dest='fa',src='auto')
+         alltext+=("{num1}\n{d1} --> {d2}\n{txt}.\n\n".format(num1=number1,d1=datetime1,d2=datetime2,txt=grouptxtTranslate.text))
     return(alltext)
 
 def writefile(txt):
@@ -54,9 +57,9 @@ def writefile(txt):
 
 def translatefile(txt):
     filepath=os.path.join(os.path.dirname(__file__), "DestinationSubFile.fa.srt")
-    f = open(filepath, "w")
+    f = open(filepath, "w",encoding="utf-8")
     f.write(txt)
     f.close()
 
 if __name__=="__main__":
-    app.run("0.0.0.0",5000)
+    app.run("0.0.0.0",5000,debug=True)
